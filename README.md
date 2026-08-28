@@ -1,58 +1,90 @@
-# Origin Database Dashboard v2
+# Origin Dashboard
 
-Next.js 16 + Supabase + Render.
+Dashboard Next.js + Supabase pour les bases **Personnages** et **Donjons**.
 
-## Authentification
-La connexion administrateur est maintenant une **Server Action** : Supabase écrit la session dans les cookies côté serveur, puis `redirect("/")`. Le `proxy.ts` rafraîchit la session pour les requêtes suivantes.
+## Cette version
 
-Dans Supabase Auth :
-- crée un seul utilisateur propriétaire ;
-- désactive les inscriptions publiques ;
-- mets son adresse exacte dans `ADMIN_EMAIL` sur Render.
-
-## Base
-Exécute `supabase/schema.sql` sur une base neuve. Le schéma inclut aussi `rarete` et `image_url`, présents dans ton projet actuel.
-
-## Fonctionnalités
-- dashboard SaaS inspiré du logo fourni ;
-- vue d'ensemble ;
-- Personnages / Donjons ;
-- filtres combinables + recherche ;
-- classements et pourcentages ;
-- graphiques sans dépendance lourde ;
-- édition directe des lignes côté administrateur ;
-- ajout rapide ;
-- import CSV ;
+- édition directe dans les tableaux ;
+- après enregistrement, la ligne reste à sa position visuelle et sort immédiatement du mode édition ;
+- suppression d'une ligne avec confirmation ;
+- pagination de 50 lignes pour éviter de rendre des centaines/milliers de `<tr>` simultanément ;
+- ajout rapide via le bouton `+` fixe ;
+- import CSV validé côté serveur et inséré par lots de 400, avec jusqu'à 4 lots traités en parallèle ;
+- import sans rechargement complet du navigateur (`router.refresh`) ;
+- graphiques et badges avec couleurs sémantiques pour raretés, éléments et armes ;
+- filtres combinables ;
 - export CSV ;
-- RLS lecture publique / écriture serveur `service_role` ;
-- compte admin unique.
+- authentification Supabase réservée au compte défini par `ADMIN_EMAIL`.
+
+## Palette
+
+### Raretés
+- SR : violet
+- SSR : jaune
+
+### Éléments
+- Feu : rouge
+- Glace : bleu clair
+- Terre : marron
+- Foudre : bleu foncé
+- Vent : vert
+- Physique : gris
+- Ténèbres : violet
+- Sacré : jaune
+
+### Armes
+- Espadon / Epees Doubles / Epee Longue : bleu royal → bleu clair
+- Grimoire / Baguette / Bâton : bordeaux → orange
+- Hache / Nunchaku / Gantelets : noir → rouge sang
+- Lance / Rapière / Epee & Bouclier : vert → vert clair
+
+## Variables Render
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+ADMIN_EMAIL=...
+```
+
+Ne jamais exposer `SUPABASE_SERVICE_ROLE_KEY` au navigateur.
 
 ## CSV
-Personnages : `personnage,rarete,arme,element,type_personnage,histoire,image_url`
-Donjons : `nom_donjon,faiblesses,etat,type`
 
-Pour les faiblesses CSV, sépare les deux valeurs par `|`, par exemple `Feu|Ténèbres`.
+Personnages :
+
+```csv
+personnage,rarete,arme,element,type_personnage,histoire,image_url
+```
+
+Donjons :
+
+```csv
+nom_donjon,faiblesses,etat,type
+```
+
+Pour plusieurs faiblesses, utiliser `|` : `Feu|Ténèbres`.
+
+La taille maximale d'un CSV est de 10 Mo dans l'application. Next.js est configuré avec une limite Server Action de 10 Mo pour permettre ces imports ; la limite par défaut des Server Actions est de 1 Mo.
+
+## Performance
+
+La table n'affiche que 50 lignes à la fois. Les modifications et suppressions mettent à jour l'interface localement sans rechargement complet. Les imports sont découpés en lots afin de ne pas envoyer une énorme insertion PostgreSQL en une seule opération. Supabase recommande également la pagination avec `range()` lorsque les volumes deviennent importants.
+
+Si les bases dépassent plusieurs milliers de lignes, l'étape suivante recommandée est de déplacer la pagination et les statistiques côté serveur/SQL : cela évitera de charger toute la base au navigateur pour calculer les graphiques.
 
 ## Déploiement Render
-Build: `npm ci && npm run build`
-Start: `npm start`
 
-Variables :
-- NEXT_PUBLIC_SUPABASE_URL
-- NEXT_PUBLIC_SUPABASE_ANON_KEY
-- SUPABASE_SERVICE_ROLE_KEY
-- ADMIN_EMAIL
+Build :
 
-## Important
-Ne committe jamais `.env` ni `SUPABASE_SERVICE_ROLE_KEY`.
+```bash
+npm ci && npm run build
+```
 
+Start :
 
-## Interface V3
+```bash
+npm start
+```
 
-- Couleurs dédiées aux raretés : **SR violet**, **SSR jaune**.
-- Couleurs dédiées aux éléments : **Feu rouge**, **Glace bleu clair**, **Terre marron**, **Foudre bleu foncé**, **Vent vert**, **Physique gris**, **Ténèbres violet**, **Sacré jaune**.
-- Sur les pages Personnages et Donjons, l'ordre est strictement : **récapitulatif → recherche/filtres/classement → tableau → statistiques**.
-- Le bouton `+` flottant en bas à droite est réservé à l'administrateur et ouvre un vrai popup d'ajout.
-- Le popup permet de basculer entre ajout d'un Personnage et ajout d'un Donjon.
-- L'édition directe reste disponible dans les tableaux.
-- Les outils CSV restent accessibles après les analyses.
+Le projet utilise le système `proxy.ts` de Next.js 16. Next.js 16 a renommé `middleware.ts` en `proxy.ts`.
