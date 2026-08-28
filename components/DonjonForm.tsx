@@ -8,7 +8,7 @@ export function DonjonForm({ edit }: { edit: Donjon | null }) {
   const [selected, setSelected] = useState<string[]>(edit?.faiblesses ?? []);
   const toggle = (e: string) => setSelected(v => v.includes(e) ? v.filter(x => x !== e) : v.length < 2 ? [...v, e] : v);
 
-  return <form className="form-card" action={async (fd) => { await saveDonjon(fd); }}>
+  return <form className="form-card" action={async (fd) => { void (await saveDonjon(fd)); }}>
     {edit && <input type="hidden" name="id" value={edit.id}/>}
     <h3>{edit ? "Modifier" : "Ajouter"} un donjon</h3>
     <label>Nom du donjon<input name="nom_donjon" defaultValue={edit?.nom_donjon ?? ""} required/></label>
