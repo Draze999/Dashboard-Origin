@@ -106,7 +106,7 @@ function Personnages({ rows, isAdmin }: { rows: Personnage[]; isAdmin: boolean }
       <Metric label="DPS" value={base.filter(r => r.type_personnage === "DPS").length} sub={pct(base.filter(r => r.type_personnage === "DPS").length, base.length)}/>
       <Metric label="OC" value={base.filter(r => r.histoire === "OC").length} sub={pct(base.filter(r => r.histoire === "OC").length, base.length)}/>
     </section>
-    <Toolbar q={q} setQ={setQ} filters={filters} setFilters={setFilters} sort={sort} setSort={setSort} options={[
+    <Toolbar q={q} setQ={setQ} filters={filters} setFilters={(x) => setFilters(x as typeof filters)} sort={sort} setSort={setSort} options={[
       ["rarete", "Rareté", ["Toutes", ...RARETES]], ["arme", "Arme", ["Toutes", ...ARMES]], ["element", "Élément", ["Tous", ...ELEMENTS]], ["type", "Type", ["Tous", ...TYPES_PERSONNAGE]], ["histoire", "Histoire", ["Toutes", ...HISTOIRES]]
     ]} sortOptions={[["personnage", "Nom"], ["rarete", "Rareté"], ["element", "Élément"], ["arme", "Arme"], ["type_personnage", "Type"], ["histoire", "Histoire"]]}/>
     <CharacterTable rows={filtered} isAdmin={isAdmin}/>
@@ -140,7 +140,7 @@ function Donjons({ rows, isAdmin }: { rows: Donjon[]; isAdmin: boolean }) {
       <Metric label="Sans faiblesse" value={rows.filter(r => !r.faiblesses.length).length} sub={pct(rows.filter(r => !r.faiblesses.length).length, rows.length)}/>
       <Metric label="Faiblesses moy." value={rows.length ? (rows.reduce((s, r) => s + r.faiblesses.length, 0) / rows.length).toFixed(2) : "0"} sub="par donjon"/>
     </section>
-    <Toolbar q={q} setQ={setQ} filters={filters} setFilters={setFilters} sort={sort} setSort={setSort} options={[["etat", "État", ["Tous", ...ETATS_DONJON]], ["type", "Type", ["Tous", ...TYPES_DONJON]], ["faiblesse", "Faiblesse", ["Toutes", ...ELEMENTS]]]} sortOptions={[["nom_donjon", "Nom"], ["etat", "État"], ["type", "Type"], ["faiblesse", "Nb. faiblesses"]]}/>
+    <Toolbar q={q} setQ={setQ} filters={filters} setFilters={(x) => setFilters(x as typeof filters)} sort={sort} setSort={setSort} options={[["etat", "État", ["Tous", ...ETATS_DONJON]], ["type", "Type", ["Tous", ...TYPES_DONJON]], ["faiblesse", "Faiblesse", ["Toutes", ...ELEMENTS]]]} sortOptions={[["nom_donjon", "Nom"], ["etat", "État"], ["type", "Type"], ["faiblesse", "Nb. faiblesses"]]}/>
     <DungeonTable rows={filtered} isAdmin={isAdmin}/>
     <section className="analysis-block"><div className="section-title"><div><span className="eyebrow">ANALYSE</span><h2>Statistiques et classements</h2></div><span>{filtered.length} lignes filtrées</span></div>
       <div className="chart-grid"><Bars title="Faiblesses — % des donjons" data={weakness}/><Bars title="États" data={counts(filtered.map(x => x.etat))}/><Bars title="Types de donjon" data={counts(filtered.map(x => x.type))}/><Donut title="Nombre de faiblesses par donjon" data={counts(filtered.map(x => String(x.faiblesses.length)))}/></div>
