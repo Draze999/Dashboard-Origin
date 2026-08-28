@@ -17,8 +17,7 @@ const dSchema = z.object({
   etat:z.enum(ETATS_DONJON), type:z.enum(TYPES_DONJON)
 });
 function weaknesses(fd: FormData) {
-  const raw = String(fd.get("faiblesses") ?? "");
-  return raw ? raw.split(",").filter(Boolean) : [];
+  return fd.getAll("faiblesses").map(String).filter(Boolean);
 }
 export async function loginAdmin(_prev: {error:string}, fd: FormData) {
   const email=String(fd.get("email")??"").trim();

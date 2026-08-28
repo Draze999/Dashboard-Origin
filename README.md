@@ -45,3 +45,14 @@ Variables :
 
 ## Important
 Ne committe jamais `.env` ni `SUPABASE_SERVICE_ROLE_KEY`.
+
+
+## Interface V3
+
+- Couleurs dédiées aux raretés : **SR violet**, **SSR jaune**.
+- Couleurs dédiées aux éléments : **Feu rouge**, **Glace bleu clair**, **Terre marron**, **Foudre bleu foncé**, **Vent vert**, **Physique gris**, **Ténèbres violet**, **Sacré jaune**.
+- Sur les pages Personnages et Donjons, l'ordre est strictement : **récapitulatif → recherche/filtres/classement → tableau → statistiques**.
+- Le bouton `+` flottant en bas à droite est réservé à l'administrateur et ouvre un vrai popup d'ajout.
+- Le popup permet de basculer entre ajout d'un Personnage et ajout d'un Donjon.
+- L'édition directe reste disponible dans les tableaux.
+- Les outils CSV restent accessibles après les analyses.
