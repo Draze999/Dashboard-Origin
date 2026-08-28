@@ -1,40 +1,14 @@
-"use client";
-
-import { useState } from "react";
-import { createBrowserClient } from "@supabase/ssr";
-import { useRouter } from "next/navigation";
-
-export default function LoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
-  async function login(e: React.FormEvent) {
-    e.preventDefault();
-    setError("");
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) return setError("Identifiants invalides.");
-    router.push("/");
-    router.refresh();
-  }
-
-  return (
-    <main className="auth-page">
-      <form className="auth-card" onSubmit={login}>
-        <div className="eyebrow">ORIGIN</div>
-        <h1>Administration</h1>
-        <p>Connexion réservée au propriétaire de la base.</p>
-        <label>Email<input type="email" value={email} onChange={e => setEmail(e.target.value)} required /></label>
-        <label>Mot de passe<input type="password" value={password} onChange={e => setPassword(e.target.value)} required /></label>
-        {error && <div className="error">{error}</div>}
-        <button className="primary" type="submit">Se connecter</button>
-        <a href="/" className="back-link">← Retour aux données</a>
-      </form>
-    </main>
-  );
+import { LoginForm } from "./LoginForm";
+import { getCurrentUser } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+export default async function LoginPage() {
+  const user=await getCurrentUser();
+  if(user && user.email?.toLowerCase()===process.env.ADMIN_EMAIL?.toLowerCase()) redirect("/");
+  return <main className="login-page"><div className="login-card">
+    <img src="/logo.png" className="login-logo" alt="The Seven Deadly Sins Origin"/>
+    <div className="eyebrow">ORIGIN DATABASE</div><h1>Administration</h1>
+    <p>Connexion privée. Seul le compte propriétaire peut modifier les bases.</p>
+    <LoginForm />
+    <a href="/" className="back-link">← Retour au dashboard</a>
+  </div></main>;
 }

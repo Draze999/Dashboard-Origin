@@ -1,69 +1,47 @@
-# Origin Dashboard
+# Origin Database Dashboard v2
 
-Dashboard Next.js + Supabase pour deux bases indépendantes :
+Next.js 16 + Supabase + Render.
 
-- **Personnages** : personnage, arme, élément, type, histoire.
-- **Donjons** : nom, 0–2 faiblesses, état, type.
-- Lecture publique.
-- Écriture réservée à un unique compte Supabase Auth dont l'e-mail est `ADMIN_EMAIL`.
-- Filtres, recherche, statistiques, classements et pourcentages.
-- Déploiement prévu sur Render.
+## Authentification
+La connexion administrateur est maintenant une **Server Action** : Supabase écrit la session dans les cookies côté serveur, puis `redirect("/")`. Le `proxy.ts` rafraîchit la session pour les requêtes suivantes.
 
-## 1. Créer la base Supabase
+Dans Supabase Auth :
+- crée un seul utilisateur propriétaire ;
+- désactive les inscriptions publiques ;
+- mets son adresse exacte dans `ADMIN_EMAIL` sur Render.
 
-Dans Supabase → SQL Editor, exécuter `supabase/schema.sql`.
+## Base
+Exécute `supabase/schema.sql` sur une base neuve. Le schéma inclut aussi `rarete` et `image_url`, présents dans ton projet actuel.
 
-Puis dans Authentication :
-1. créer ton unique utilisateur administrateur ;
-2. désactiver les inscriptions publiques ;
-3. placer son e-mail dans `ADMIN_EMAIL`.
+## Fonctionnalités
+- dashboard SaaS inspiré du logo fourni ;
+- vue d'ensemble ;
+- Personnages / Donjons ;
+- filtres combinables + recherche ;
+- classements et pourcentages ;
+- graphiques sans dépendance lourde ;
+- édition directe des lignes côté administrateur ;
+- ajout rapide ;
+- import CSV ;
+- export CSV ;
+- RLS lecture publique / écriture serveur `service_role` ;
+- compte admin unique.
 
-## 2. Variables locales
+## CSV
+Personnages : `personnage,rarete,arme,element,type_personnage,histoire,image_url`
+Donjons : `nom_donjon,faiblesses,etat,type`
 
-Copier `.env.example` vers `.env.local` puis renseigner :
+Pour les faiblesses CSV, sépare les deux valeurs par `|`, par exemple `Feu|Ténèbres`.
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=...
-NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-SUPABASE_SERVICE_ROLE_KEY=...
-ADMIN_EMAIL=...
-```
+## Déploiement Render
+Build: `npm ci && npm run build`
+Start: `npm start`
 
-**Ne jamais exposer `SUPABASE_SERVICE_ROLE_KEY` au navigateur et ne jamais la committer.**
+Variables :
+- NEXT_PUBLIC_SUPABASE_URL
+- NEXT_PUBLIC_SUPABASE_ANON_KEY
+- SUPABASE_SERVICE_ROLE_KEY
+- ADMIN_EMAIL
 
-## 3. Lancer
-
-```bash
-npm install
-npm run dev
-```
-
-Puis ouvrir http://localhost:3000.
-
-## 4. Render
-
-Créer un Web Service relié au dépôt :
-
-- Build: `npm install && npm run build`
-- Start: `npm start`
-
-Ajouter les 4 variables d'environnement dans Render.
-
-Render fournira ensuite un domaine `onrender.com`; tu peux ajouter ton sous-domaine OVH, par exemple :
-
-`origin.lasandboxdedraze.xyz`
-
-en tant que Custom Domain du service Render.
-
-## 5. Sécurité
-
-Les tables Supabase ont RLS activé :
-- `anon` et `authenticated` : lecture uniquement ;
-- `service_role` : utilisé uniquement côté serveur ;
-- les actions d'administration vérifient d'abord l'utilisateur Supabase Auth et son e-mail.
-
-Ainsi, même si quelqu'un tente d'appeler directement la Data API avec la clé publique, il ne peut pas écrire dans les tables.
-
-## Administration des faiblesses
-
-Le formulaire du site permet de sélectionner 0 à 2 faiblesses. La validation est également répétée côté serveur et dans PostgreSQL.
+## Important
+Ne committe jamais `.env` ni `SUPABASE_SERVICE_ROLE_KEY`.
