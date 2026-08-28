@@ -63,7 +63,7 @@ function PersonnageEditor({ rows }: { rows: Personnage[] }) {
   const item = edit ?? empty;
   return (
     <div className="editor-grid">
-      <form className="form-card" action={savePersonnage}>
+      <form className="form-card" action={async (fd) => { await savePersonnage(fd); }}>
         {edit && <input type="hidden" name="id" value={edit.id} />}
         <h3>{edit ? "Modifier" : "Ajouter"} un personnage</h3>
         <label>
@@ -130,7 +130,7 @@ function PersonnageEditor({ rows }: { rows: Personnage[] }) {
               <button onClick={() => setEdit(r)} className="link-button">
                 Modifier
               </button>
-              <form action={deletePersonnage} className="inline">
+              <form action={async (fd) => { await deletePersonnage(fd); }} className="inline">
                 <input type="hidden" name="id" value={r.id} />
                 <button className="danger" type="submit">
                   Supprimer
@@ -158,7 +158,7 @@ function DonjonEditor({ rows }: { rows: Donjon[] }) {
               <button onClick={() => setEdit(r)} className="link-button">
                 Modifier
               </button>
-              <form action={deleteDonjon} className="inline">
+              <form action={async (fd) => { await deleteDonjon(fd); }} className="inline">
                 <input type="hidden" name="id" value={r.id} />
                 <button className="danger" type="submit">
                   Supprimer

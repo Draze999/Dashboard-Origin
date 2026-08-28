@@ -9,7 +9,18 @@ import { deleteDonjon, deletePersonnage, importCsv, logout, saveDonjon, savePers
 
 type Tab = "overview" | "personnages" | "donjons";
 type AddKind = "personnages" | "donjons";
-type Filters = Record<string, string>;
+type CharacterFilters = {
+  rarete: string;
+  arme: string;
+  element: string;
+  type: string;
+  histoire: string;
+};
+type DungeonFilters = {
+  etat: string;
+  type: string;
+  faiblesse: string;
+};
 
 const TONES: Record<string, string> = {
   SR: "sr", SSR: "ssr", Physique: "physique", Feu: "feu", Glace: "glace", Vent: "vent",
@@ -104,7 +115,7 @@ function Personnages({ rows, isAdmin, onRowsChange }: { rows: Personnage[]; isAd
   const [data, setData] = useState(rows);
   useEffect(() => { if (rows.length !== data.length) setData(rows); }, [rows.length, data.length]);
   const [q, setQ] = useState("");
-  const [filters, setFilters] = useState({ rarete: "Toutes", arme: "Toutes", element: "Tous", type: "Tous", histoire: "Toutes" });
+  const [filters, setFilters] = useState<CharacterFilters>({ rarete: "Toutes", arme: "Toutes", element: "Tous", type: "Tous", histoire: "Toutes" });
   const [sort, setSort] = useState("personnage");
   const filtered = useMemo(() => {
     const result = data.filter(r => (!q || r.personnage.toLowerCase().includes(q.toLowerCase())) &&
@@ -138,7 +149,7 @@ function Donjons({ rows, isAdmin, onRowsChange }: { rows: Donjon[]; isAdmin: boo
   const [data, setData] = useState(rows);
   useEffect(() => { if (rows.length !== data.length) setData(rows); }, [rows.length, data.length]);
   const [q, setQ] = useState("");
-  const [filters, setFilters] = useState({ etat: "Tous", type: "Tous", faiblesse: "Toutes" });
+  const [filters, setFilters] = useState<DungeonFilters>({ etat: "Tous", type: "Tous", faiblesse: "Toutes" });
   const [sort, setSort] = useState("nom_donjon");
   const filtered = useMemo(() => {
     const result = data.filter(r => (!q || r.nom_donjon.toLowerCase().includes(q.toLowerCase())) &&
@@ -195,12 +206,21 @@ function CsvTools({ kind, rows }: { kind: AddKind; rows: Personnage[] | Donjon[]
   return <div className="csv-tools-card"><div><span className="eyebrow">ADMIN / DATA</span><strong>Import / export CSV</strong><small>{rows.length} lignes disponibles · import validé puis inséré par lots de 400.</small>{status && <small className="csv-status">{status}</small>}</div><div className="csv-tools"><button className="ghost" onClick={exportCsv}>↓ Exporter CSV</button><label className={`ghost file-button ${pending ? "disabled" : ""}`}>↑ {pending ? "Import…" : "Importer CSV"}<input disabled={pending} type="file" accept=".csv,text/csv" onChange={e => { const file = e.target.files?.[0]; if (file) doImport(file); e.currentTarget.value = ""; }}/></label></div></div>;
 }
 
-function Toolbar({ q, setQ, filters, setFilters, options, sort, setSort, sortOptions }: { q: string; setQ: (x: string) => void; filters: Filters; setFilters: (x: Filters) => void; options: [string, string, string[]][]; sort: string; setSort: (x: string) => void; sortOptions: [string, string][] }) {
+function Toolbar<T extends Record<string, string>>({ q, setQ, filters, setFilters, options, sort, setSort, sortOptions }: {
+  q: string;
+  setQ: (x: string) => void;
+  filters: T;
+  setFilters: (x: T) => void;
+  options: [string, string, string[]][];
+  sort: string;
+  setSort: (x: string) => void;
+  sortOptions: [string, string][];
+}) {
   return <div className="toolbar">
     <div className="search">⌕<input value={q} onChange={e => setQ(e.target.value)} placeholder="Rechercher…"/></div>
-    {options.map(([key, label, opts]) => <select key={key} value={filters[key]} aria-label={label} onChange={e => setFilters({ ...filters, [key]: e.target.value })}>{opts.map(o => <option key={o}>{o}</option>)}</select>)}
+    {options.map(([key, label, opts]) => <select key={key} value={filters[key]} aria-label={label} onChange={e => setFilters({ ...filters, [key]: e.target.value } as T)}>{opts.map(o => <option key={o}>{o}</option>)}</select>)}
     <select value={sort} aria-label="Classement" onChange={e => setSort(e.target.value)}>{sortOptions.map(([value, label]) => <option key={value} value={value}>Tri : {label}</option>)}</select>
-    <button className="ghost" onClick={() => { setQ(""); setFilters(Object.fromEntries(options.map(([k, , o]) => [k, o[0]]))); setSort(sortOptions[0][0]); }}>Réinitialiser</button>
+    <button className="ghost" onClick={() => { setQ(""); setFilters(Object.fromEntries(options.map(([k, , o]) => [k, o[0]])) as T); setSort(sortOptions[0][0]); }}>Réinitialiser</button>
   </div>;
 }
 
