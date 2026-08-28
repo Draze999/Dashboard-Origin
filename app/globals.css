@@ -1190,3 +1190,90 @@ tr:hover td {
   opacity: 0.5;
   pointer-events: none;
 }
+
+
+/* Dashboard semantic chart palettes */
+:root {
+  --dps-color: #ef4444;
+  --deluge-color: #f2c94c;
+  --defense-color: #4f8cff;
+  --support-color: #48c774;
+  --histoire-7ds-color: #f28c28;
+  --histoire-4koa-color: #43b96b;
+  --histoire-oc-color: #a855f7;
+  --disponible-color: #48c774;
+  --desactive-color: #9b5cff;
+  --retire-color: #ef4444;
+  --termine-color: #4f8cff;
+  --jonction-color: #4f8cff;
+  --boss-elite-color: #ef4444;
+  --donjon-color: #48c774;
+  --raid-color: #9b5cff;
+}
+
+.bar-fill.tone-dps { background: var(--dps-color); }
+.bar-fill.tone-deluge { background: var(--deluge-color); }
+.bar-fill.tone-defense { background: var(--defense-color); }
+.bar-fill.tone-support { background: var(--support-color); }
+.bar-fill.tone-histoire-7ds { background: var(--histoire-7ds-color); }
+.bar-fill.tone-histoire-4koa { background: var(--histoire-4koa-color); }
+.bar-fill.tone-histoire-oc { background: var(--histoire-oc-color); }
+.bar-fill.tone-disponible { background: var(--disponible-color); }
+.bar-fill.tone-desactive { background: var(--desactive-color); }
+.bar-fill.tone-retire { background: var(--retire-color); }
+.bar-fill.tone-termine { background: var(--termine-color); }
+.bar-fill.tone-jonction { background: var(--jonction-color); }
+.bar-fill.tone-boss-elite { background: var(--boss-elite-color); }
+.bar-fill.tone-donjon { background: var(--donjon-color); }
+.bar-fill.tone-raid { background: var(--raid-color); }
+
+.legend-dot.tone-dps { background: var(--dps-color); }
+.legend-dot.tone-deluge { background: var(--deluge-color); }
+.legend-dot.tone-defense { background: var(--defense-color); }
+.legend-dot.tone-support { background: var(--support-color); }
+.legend-dot.tone-histoire-7ds { background: var(--histoire-7ds-color); }
+.legend-dot.tone-histoire-4koa { background: var(--histoire-4koa-color); }
+.legend-dot.tone-histoire-oc { background: var(--histoire-oc-color); }
+.legend-dot.tone-disponible { background: var(--disponible-color); }
+.legend-dot.tone-desactive { background: var(--desactive-color); }
+.legend-dot.tone-retire { background: var(--retire-color); }
+.legend-dot.tone-termine { background: var(--termine-color); }
+.legend-dot.tone-jonction { background: var(--jonction-color); }
+.legend-dot.tone-boss-elite { background: var(--boss-elite-color); }
+.legend-dot.tone-donjon { background: var(--donjon-color); }
+.legend-dot.tone-raid { background: var(--raid-color); }
+
+.tone-text-dps { color: var(--dps-color); }
+.tone-text-deluge { color: var(--deluge-color); }
+.tone-text-defense { color: var(--defense-color); }
+.tone-text-support { color: var(--support-color); }
+.tone-text-histoire-7ds { color: var(--histoire-7ds-color); }
+.tone-text-histoire-4koa { color: var(--histoire-4koa-color); }
+.tone-text-histoire-oc { color: var(--histoire-oc-color); }
+.tone-text-disponible { color: var(--disponible-color); }
+.tone-text-desactive { color: var(--desactive-color); }
+.tone-text-retire { color: var(--retire-color); }
+.tone-text-termine { color: var(--termine-color); }
+.tone-text-jonction { color: var(--jonction-color); }
+.tone-text-boss-elite { color: var(--boss-elite-color); }
+.tone-text-donjon { color: var(--donjon-color); }
+.tone-text-raid { color: var(--raid-color); }
+
+.table-head-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.collapse-button {
+  white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+  .table-head-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
