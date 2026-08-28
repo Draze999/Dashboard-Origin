@@ -1075,39 +1075,23 @@ tr:hover td {
   --weapon-green-secondary: #8ee8ad;
 }
 .bar-fill.weapon-royal {
-  background: radial-gradient(
-    circle at 75% 40%,
-    var(--weapon-royal-color),
-    var(--weapon-royal-secondary)
-  );
+  background: linear-gradient(135deg, var(--weapon-royal-color), var(--weapon-royal-secondary))
 }
 .bar-fill.weapon-bordeaux {
-  background: radial-gradient(
-    circle at 75% 40%,
-    var(--weapon-bordeaux-color),
-    var(--weapon-bordeaux-secondary)
-  );
+  background: linear-gradient(135deg, var(--weapon-bordeaux-color), var(--weapon-bordeaux-secondary))
 }
 .bar-fill.weapon-black {
-  background: radial-gradient(
-    circle at 75% 40%,
-    var(--weapon-black-color),
-    var(--weapon-black-secondary)
-  );
+  background: linear-gradient(135deg, var(--weapon-black-color), var(--weapon-black-secondary))
 }
 .bar-fill.weapon-green {
-  background: radial-gradient(
-    circle at 75% 40%,
-    var(--weapon-green-color),
-    var(--weapon-green-secondary)
-  );
+  background: linear-gradient(135deg, var(--weapon-green-color), var(--weapon-green-secondary))
 }
 .weapon-badge {
   border-width: 1px;
   background: radial-gradient(
     circle at 75% 40%,
-    var(--weapon-color),
-    var(--weapon-secondary)
+    var(--weapon-secondary),
+    var(--weapon-color)
   );
   color: #fff;
   box-shadow:
