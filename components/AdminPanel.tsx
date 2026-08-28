@@ -34,3 +34,7 @@ function DonjonEditor({rows}:{rows:Donjon[]}) {
   const [edit,setEdit] = useState<Donjon|null>(null);
   return <div className="editor-grid"><DonjonForm edit={edit}/><div className="mini-list"><h3>Entrées existantes</h3>{rows.map(r=><div className="mini-row" key={r.id}><span>{r.nom_donjon}</span><div><button onClick={()=>setEdit(r)} className="link-button">Modifier</button><form action={deleteDonjon} className="inline"><input type="hidden" name="id" value={r.id}/><button className="danger" type="submit">Supprimer</button></form></div></div>)}</div></div>;
 }
+
+function Select({name,value,options}:{name:string;value:string;options:readonly string[]}) {
+  return <select name={name} defaultValue={value}>{options.map(o=><option key={o}>{o}</option>)}</select>;
+}

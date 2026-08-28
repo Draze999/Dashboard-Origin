@@ -44,7 +44,7 @@ Puis ouvrir http://localhost:3000.
 
 Créer un Web Service relié au dépôt :
 
-- Build: `npm ci && npm run build`
+- Build: `npm install && npm run build`
 - Start: `npm start`
 
 Ajouter les 4 variables d'environnement dans Render.
