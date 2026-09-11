@@ -1,5 +1,3 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-
 export const POKEMON_TYPES = [
   "Normal", "Feu", "Eau", "Électrik", "Plante", "Glace", "Combat", "Poison",
   "Sol", "Vol", "Psy", "Insecte", "Roche", "Spectre", "Dragon", "Ténèbres",
@@ -71,12 +69,3 @@ export function effectivenessLabel(value: number) {
   return `${value}×`;
 }
 
-export async function getPokemonRows(): Promise<PokemonRow[]> {
-  const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
-    .from("pokemon")
-    .select("id,national_id,nom_fr,nom_en,type_1,type_2,image_url")
-    .order("national_id");
-  if (error) throw new Error(error.message);
-  return (data ?? []) as PokemonRow[];
-}

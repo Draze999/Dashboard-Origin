@@ -1,5 +1,5 @@
 import { PokemonGame } from "@/components/PokemonGame";
-import { getPokemonRows } from "@/lib/pokemon";
+import { getPokemonRows } from "@/lib/pokemon-server";
 
 export const dynamic = "force-dynamic";
 
