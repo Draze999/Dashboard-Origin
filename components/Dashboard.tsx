@@ -66,6 +66,7 @@ export function Dashboard({ personnages: initialPersonnages, donjons: initialDon
       <button className={tab === "overview" ? "nav active" : "nav"} onClick={() => setTab("overview")}><span>◈</span> Vue d’ensemble</button>
       <button className={tab === "personnages" ? "nav active" : "nav"} onClick={() => setTab("personnages")}><span>♢</span> Personnages <b>{personnages.length}</b></button>
       <button className={tab === "donjons" ? "nav active" : "nav"} onClick={() => setTab("donjons")}><span>◇</span> Donjons <b>{donjons.length}</b></button>
+      <a className="nav" href="/pokemon"><span>⚡</span> Pokémon <b>JEU</b></a>
       <div className="side-footer">
         {isAdmin ? <><span className="admin-dot"/> Admin connecté <form action={logout}><button className="logout">Déconnexion</button></form></> : <a href="/login">Connexion administrateur →</a>}
       </div>

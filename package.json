@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "pokemon:seed": "node scripts/generate-pokemon-seed.mjs"
   },
   "engines": {
     "node": ">=20.9.0 <25"

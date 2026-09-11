@@ -1,0 +1,4 @@
+national_id,nom_fr,nom_en,type_1,type_2,image_url
+25,Pikachu,Pikachu,Électrik,,"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png"
+6,Dracaufeu,Charizard,Feu,Vol,"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"
+448,Lucario,Lucario,Combat,Acier,"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/448.png"
