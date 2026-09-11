@@ -37,6 +37,15 @@ function resultClass(v: number) {
   return v === 0 ? "result-0" : v < 1 ? "result-low" : v > 1 ? "result-high" : "result-neutral";
 }
 
+function formatMultiplier(value: number) {
+  return String(value).replace(".", ",");
+}
+
+function bucketLabel(bucket: SortBucket) {
+  return { immune: "Immunité", weak: "Faiblesse", resist: "Résistance", normal: "Neutre" }[bucket];
+}
+
+
 export function PokemonGame({ initialPokemon, databaseError }: { initialPokemon: PokemonRow[]; databaseError: boolean }) {
   const [mode, setMode] = useState<Mode>("single");
   const [round, setRound] = useState(0);
@@ -50,12 +59,16 @@ export function PokemonGame({ initialPokemon, databaseError }: { initialPokemon:
   const [sortItems, setSortItems] = useState<PokemonType[]>([]);
   const [sortPlaced, setSortPlaced] = useState<Record<SortBucket, PokemonType[]>>({ immune:[], weak:[], resist:[], normal:[] });
   const [sortStarted, setSortStarted] = useState(false);
+  const [sortFeedback, setSortFeedback] = useState<{ type: "good" | "bad"; text: string } | null>(null);
 
-  const pool = initialPokemon.length ? initialPokemon : FALLBACK;
+  const validPool = initialPokemon.filter(row =>
+    POKEMON_TYPES.includes(row.type_1) && (!row.type_2 || POKEMON_TYPES.includes(row.type_2))
+  );
+  const pool = validPool.length ? validPool : FALLBACK;
   const currentValue = useMemo(() => effectiveness(attack, defenses), [attack, defenses]);
 
   function newRound(nextMode = mode) {
-    setAnswered(false); setLastCorrect(null); setRound(x => x + 1);
+    setAnswered(false); setLastCorrect(null); setSortFeedback(null); setRound(x => x + 1);
     if (nextMode === "single") {
       const a = random([...POKEMON_TYPES]); setAttack(a); setDefenses([random([...POKEMON_TYPES])]);
     } else if (nextMode === "double") {
@@ -75,7 +88,7 @@ export function PokemonGame({ initialPokemon, databaseError }: { initialPokemon:
   }
 
   function chooseMode(next: Mode) {
-    setMode(next); setScore(0); setStreak(0); setLastCorrect(null);
+    setMode(next); setScore(0); setStreak(0); setLastCorrect(null); setSortFeedback(null);
     if (next === "sort") {
       const a = random([...POKEMON_TYPES]); setAttack(a); setSortItems(shuffle([...POKEMON_TYPES]));
       setSortPlaced({ immune:[], weak:[], resist:[], normal:[] }); setSortStarted(true);
@@ -102,17 +115,27 @@ export function PokemonGame({ initialPokemon, databaseError }: { initialPokemon:
   }
 
   function place(bucket: SortBucket, t: PokemonType) {
-    if (sortPlaced[bucket].includes(t)) return;
-    const correctBucket = effectiveness(attack, [t]) === 0 ? "immune" :
-      effectiveness(attack, [t]) > 1 ? "weak" :
-      effectiveness(attack, [t]) < 1 ? "resist" : "normal";
+    if (!sortItems.includes(t)) return;
+    const multiplier = effectiveness(attack, [t]);
+    const correctBucket: SortBucket = multiplier === 0 ? "immune" :
+      multiplier > 1 ? "weak" :
+      multiplier < 1 ? "resist" : "normal";
     const ok = bucket === correctBucket;
-    const next = { ...sortPlaced, [bucket]: [...sortPlaced[bucket], t] };
-    setSortPlaced(next);
-    setSortItems(sortItems.filter(x => x !== t));
-    setScore(x => ok ? x + 1 : x);
+
+    if (ok) {
+      setSortPlaced(prev => ({ ...prev, [bucket]: [...prev[bucket], t] }));
+      setSortItems(prev => prev.filter(x => x !== t));
+      setScore(x => x + 1);
+      setStreak(x => x + 1);
+    } else {
+      // Une mauvaise tentative reste disponible pour être réessayée.
+      setStreak(0);
+    }
     setLastCorrect(ok);
-    setStreak(x => ok ? x + 1 : 0);
+    setSortFeedback({ type: ok ? "good" : "bad", text: ok
+      ? `${t} est bien placé : ${attack} inflige ×${formatMultiplier(multiplier)} contre ce type.`
+      : `${t} n'est pas dans cette catégorie : ${attack} inflige ×${formatMultiplier(multiplier)}. Il va dans « ${bucketLabel(correctBucket)} ».`
+    });
   }
 
   const displayValue = mode === "pokemon"
@@ -156,7 +179,7 @@ export function PokemonGame({ initialPokemon, databaseError }: { initialPokemon:
         {!databaseError && initialPokemon.length === 0 && <div className="pk-notice">Base Pokémon vide : importe le fichier généré par <code>npm run pokemon:seed</code> dans Supabase.</div>}
 
         {mode === "sort" ? (
-          <SortMode attack={attack} items={sortItems} placed={sortPlaced} place={place} onNext={() => newRound("sort")} started={sortStarted}/>
+          <SortMode attack={attack} items={sortItems} placed={sortPlaced} place={place} onNext={() => newRound("sort")} started={sortStarted} feedback={sortFeedback}/>
         ) : (
           <QuestionMode
             mode={mode} attack={attack} defenses={defenses} pokemon={pokemon}
@@ -176,6 +199,7 @@ function QuestionMode({ mode, attack, defenses, pokemon, result, answered, lastC
   answered: boolean; lastCorrect: boolean | null; onAnswer: (value:number)=>void; onNext:()=>void;
 }) {
   const pokemonTypes = [pokemon.type_1, ...(pokemon.type_2 ? [pokemon.type_2] : [])];
+  const interactionTypes = mode === "pokemon" ? pokemonTypes : defenses;
   return <section className="pk-card pk-question">
     <div className="pk-question-top">
       <span className="pk-round">QUESTION</span>
@@ -203,15 +227,21 @@ function QuestionMode({ mode, attack, defenses, pokemon, result, answered, lastC
     </div>
 
     {answered && <div className={`pk-feedback ${lastCorrect ? "good" : "bad"}`}>
-      <div><b>{lastCorrect ? "Bien joué !" : "Pas tout à fait."}</b><span>{result.value}× · {result.label}</span></div>
-      {!lastCorrect && <div className="pk-explain">{attack} → {pokemonTypes.map(t => t).join(" + ")}</div>}
+      <div className="pk-feedback-main"><b>{lastCorrect ? "Bien joué !" : "Pas tout à fait."}</b><span>{result.value}× · {result.label}</span></div>
+      <div className="pk-explain">
+        {interactionTypes.map((t, index) => {
+          const multiplier = TYPE_CHART[attack][t];
+          return <span key={`${t}-${index}`} className="pk-interaction">{attack} <b>--×{formatMultiplier(multiplier)}→</b> {t}</span>;
+        })}
+      </div>
+      {mode === "pokemon" && <div className="pk-revealed-types"><small>TYPES DU POKÉMON</small><div>{pokemonTypes.map(t => <span key={t}>{typeChip(t)}</span>)}</div></div>}
       <button onClick={onNext}>Question suivante →</button>
     </div>}
   </section>
 }
 
-function SortMode({ attack, items, placed, place, onNext }: {
-  attack: PokemonType; items: PokemonType[]; placed: Record<SortBucket, PokemonType[]>; place:(b:SortBucket,t:PokemonType)=>void; onNext:()=>void; started:boolean;
+function SortMode({ attack, items, placed, place, onNext, feedback }: {
+  attack: PokemonType; items: PokemonType[]; placed: Record<SortBucket, PokemonType[]>; place:(b:SortBucket,t:PokemonType)=>void; onNext:()=>void; started:boolean; feedback: { type: "good" | "bad"; text: string } | null;
 }) {
   const buckets: { id: SortBucket; title:string; desc:string; values:number[] }[] = [
     { id:"immune", title:"Immunité", desc:"×0", values:[0] },
@@ -221,10 +251,7 @@ function SortMode({ attack, items, placed, place, onNext }: {
   ];
   return <section className="pk-card pk-sort">
     <div className="pk-sort-head"><div><span className="pk-round">CLASSEMENT</span><h2>Contre une attaque <span style={{color:TYPE_COLORS[attack]}}>{TYPE_ICONS[attack]} {attack}</span></h2><p>Dépose chaque type défenseur dans sa catégorie.</p></div><button className="pk-next" onClick={onNext}>Nouvelle série ↻</button></div>
-    <div className="pk-sort-items">{items.map(t => <button key={t} draggable onDragStart={e => e.dataTransfer.setData("type",t)} onClick={() => {
-      const target = effectiveness(attack,[t]) === 0 ? "immune" : effectiveness(attack,[t]) > 1 ? "weak" : effectiveness(attack,[t]) < 1 ? "resist" : "normal";
-      place(target,t);
-    }}>{TYPE_ICONS[t]} {t}</button>)}</div>
+    <div className="pk-sort-items">{items.map(t => <button key={t} draggable onDragStart={e => { e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("type", t); }}>{TYPE_ICONS[t]} {t}</button>)}</div>
     <div className="pk-buckets">
       {buckets.map(b => <div key={b.id} className={`pk-bucket bucket-${b.id}`}
         onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault(); const t=e.dataTransfer.getData("type") as PokemonType; if(t) place(b.id,t);}}>
@@ -232,5 +259,9 @@ function SortMode({ attack, items, placed, place, onNext }: {
         <div className="pk-dropzone">{placed[b.id].length ? placed[b.id].map(t => <span key={t} className="pk-placed" style={{"--type-color":TYPE_COLORS[t]} as React.CSSProperties}>{TYPE_ICONS[t]} {t}</span>) : <i>Dépose les types ici…</i>}</div>
       </div>)}
     </div>
+    {feedback && <div className={`pk-sort-feedback ${feedback.type}`}>
+      <b>{feedback.type === "good" ? "✓ Correct" : "✕ À revoir"}</b>
+      <span>{feedback.text}</span>
+    </div>}
   </section>
 }
