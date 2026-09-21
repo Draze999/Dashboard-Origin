@@ -41,7 +41,7 @@ alter table public.donjons
   add constraint donjons_difficulte_values_check
   check (
     difficulte <@ array[
-      'Facile','Normal','Difficile','Cauchemar','Infernal','Abysse','Transcendance'
+      'Facile','Normal','Difficile','Cauchemar','Infernal','Abysse','Transcendance', 'Jonction Bleue','Jonction Violette'
     ]::text[]
   );
 

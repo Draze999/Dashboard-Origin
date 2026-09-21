@@ -34,7 +34,7 @@ const TONES: Record<string, string> = {
   "Jonctions": "jonction", "Boss d’Elite": "boss-elite", "Boss d'Elite": "boss-elite",
   Donjons: "donjon", Raids: "raid",
   Facile: "facile", Normal: "normal", Difficile: "difficile", Cauchemar: "cauchemar",
-  Infernal: "infernal", Abysse: "abysse", Transcendance: "transcendance"
+  Infernal: "infernal", Abysse: "abysse", Transcendance: "transcendance", "Jonction Bleue": "jonction-easy", "Jonction Violette": "jonction-normal"
 };
 const WEAPON_TONES: Record<string, string> = {
   "Espadon": "royal", "Epees Doubles": "royal", "Epee Longue": "royal",

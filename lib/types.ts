@@ -5,7 +5,7 @@ export const HISTOIRES = ["7DS","4KoA","OC"] as const;
 export const RARETES = ["SR","SSR"] as const;
 export const ETATS_DONJON = ["Disponible","Temporairement désactivé","Retiré","Terminé"] as const;
 export const TYPES_DONJON = ["Boss d’Elite","Donjons","Raids","Jonctions"] as const;
-export const DIFFICULTES_DONJON = ["Facile","Normal","Difficile","Cauchemar","Infernal","Abysse","Transcendance"] as const;
+export const DIFFICULTES_DONJON = ["Facile","Normal","Difficile","Cauchemar","Infernal","Abysse","Transcendance","Jonction Bleue","Jonction Violette"] as const;
 
 export type Personnage = {
   id: string; personnage: string; rarete: typeof RARETES[number]; arme: typeof ARMES[number];

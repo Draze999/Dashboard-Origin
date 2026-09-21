@@ -23,7 +23,7 @@ create table public.donjons (
   faiblesses text[] not null default '{}',
   etat text not null check (etat in ('Disponible','Temporairement désactivé','Retiré','Terminé')),
   type text not null check (type in ('Boss d’Elite','Donjons','Raids','Jonctions')),
-  difficulte text[] not null default array['Normal']::text[] check (cardinality(difficulte) >= 1 and difficulte <@ array['Facile','Normal','Difficile','Cauchemar','Infernal','Abysse','Transcendance']::text[]),
+  difficulte text[] not null default array['Normal']::text[] check (cardinality(difficulte) >= 1 and difficulte <@ array['Facile','Normal','Difficile','Cauchemar','Infernal','Abysse','Transcendance','Jonction Bleue','Jonction Violette']::text[]),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint donjons_faiblesses_max_2 check (cardinality(faiblesses) between 0 and 2),

@@ -1334,6 +1334,16 @@ tr:hover td {
   border-color: #a83a3a;
   background: #391515;
 }
+.badge.tone-jonction-easy {
+  color: #8de4ff;
+  border-color: #3a7ca8;
+  background: #152f39;
+}
+.badge.tone-jonction-normal {
+  color: #db8dff;
+  border-color: #8e3aa8;
+  background: #2e1539;
+}
 .bar-fill.tone-facile { background: #bfc3c9; }
 .bar-fill.tone-normal { background: #3fc36d; }
 .bar-fill.tone-difficile { background: #4f8ee8; }
@@ -1341,6 +1351,8 @@ tr:hover td {
 .bar-fill.tone-infernal { background: #e85b9e; }
 .bar-fill.tone-abysse { background: #9958e8; }
 .bar-fill.tone-transcendance { background: #e74a4a; }
+.bar-fill.tone-jonction-easy { background: #8de4ff; }
+.bar-fill.tone-jonction-normal { background: #db8dff; }
 .legend-dot.tone-facile { background: #bfc3c9; }
 .legend-dot.tone-normal { background: #3fc36d; }
 .legend-dot.tone-difficile { background: #4f8ee8; }
@@ -1348,6 +1360,8 @@ tr:hover td {
 .legend-dot.tone-infernal { background: #e85b9e; }
 .legend-dot.tone-abysse { background: #9958e8; }
 .legend-dot.tone-transcendance { background: #e74a4a; }
+.legend-dot.tone-jonction-easy { background: #8de4ff; }
+.legend-dot.tone-jonction-normal { background: #db8dff; }
 .tone-text-facile { color: #d6d9de; }
 .tone-text-normal { color: #65d989; }
 .tone-text-difficile { color: #76aaff; }
@@ -1355,6 +1369,8 @@ tr:hover td {
 .tone-text-infernal { color: #f477b1; }
 .tone-text-abysse { color: #b778ff; }
 .tone-text-transcendance { color: #ff6868; }
+.tone-text-jonction-easy { color: #8de4ff; }
+.tone-text-jonction-normal { color: #db8dff; }
 
 /* Donjons : plusieurs difficultés */
 .badge-list {
