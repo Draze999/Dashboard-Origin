@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient, requireAdmin } from "@/lib/supabase/server";
-import { ARMES, ELEMENTS, ETATS_DONJON, HISTOIRES, RARETES, TYPES_DONJON, TYPES_PERSONNAGE, type Donjon, type Personnage } from "@/lib/types";
+import { ARMES, ELEMENTS, ETATS_DONJON, HISTOIRES, RARETES, TYPES_DONJON, TYPES_PERSONNAGE, DIFFICULTES_DONJON, type Donjon, type Personnage } from "@/lib/types";
 
 const pSchema = z.object({
   personnage: z.string().trim().min(1).max(120),
@@ -21,7 +21,8 @@ const dSchema = z.object({
   nom_donjon: z.string().trim().min(1).max(160),
   faiblesses: z.array(z.enum(ELEMENTS)).max(2).refine(v => new Set(v).size === v.length, "Une faiblesse ne peut pas être sélectionnée deux fois."),
   etat: z.enum(ETATS_DONJON),
-  type: z.enum(TYPES_DONJON)
+  type: z.enum(TYPES_DONJON),
+  difficulte: z.enum(DIFFICULTES_DONJON)
 });
 
 function weaknesses(fd: FormData) {
@@ -95,7 +96,8 @@ export async function saveDonjon(fd: FormData): Promise<{ ok: true; row: Donjon 
     nom_donjon: fd.get("nom_donjon"),
     faiblesses: weaknesses(fd),
     etat: fd.get("etat"),
-    type: fd.get("type")
+    type: fd.get("type"),
+    difficulte: fd.get("difficulte")
   });
   if (!parsed.success) throw new Error("Données donjon invalides.");
 
@@ -156,7 +158,8 @@ export async function importCsv(fd: FormData): Promise<{ ok: true; inserted: num
       nom_donjon: r.nom_donjon,
       faiblesses: (r.faiblesses || "").split("|").filter(Boolean),
       etat: r.etat,
-      type: r.type
+      type: r.type,
+      difficulte: r.difficulte || "Normal"
     }));
     const batches = Array.from({ length: Math.ceil(data.length / BATCH) }, (_, index) => data.slice(index * BATCH, (index + 1) * BATCH));
     for (let i = 0; i < batches.length; i += 4) {

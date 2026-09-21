@@ -4,7 +4,7 @@ import { useMemo, useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { CSSProperties, FormEvent, Dispatch, SetStateAction } from "react";
 import type { Donjon, Personnage } from "@/lib/types";
-import { ELEMENTS, ARMES, TYPES_PERSONNAGE, HISTOIRES, ETATS_DONJON, TYPES_DONJON, RARETES } from "@/lib/types";
+import { ELEMENTS, ARMES, TYPES_PERSONNAGE, HISTOIRES, ETATS_DONJON, TYPES_DONJON, DIFFICULTES_DONJON, RARETES } from "@/lib/types";
 import { deleteDonjon, deletePersonnage, importCsv, logout, saveDonjon, savePersonnage } from "@/app/actions";
 
 type Tab = "overview" | "personnages" | "donjons";
@@ -19,6 +19,7 @@ type CharacterFilters = {
 type DungeonFilters = {
   etat: string;
   type: string;
+  difficulte: string;
   faiblesse: string;
 };
 
@@ -31,7 +32,9 @@ const TONES: Record<string, string> = {
   Disponible: "disponible", "Temporairement désactivé": "desactive",
   Retiré: "retire", Terminé: "termine",
   "Jonctions": "jonction", "Boss d’Elite": "boss-elite", "Boss d'Elite": "boss-elite",
-  Donjons: "donjon", Raids: "raid"
+  Donjons: "donjon", Raids: "raid",
+  Facile: "facile", Normal: "normal", Difficile: "difficile", Cauchemar: "cauchemar",
+  Infernal: "infernal", Abysse: "abysse", Transcendance: "transcendance"
 };
 const WEAPON_TONES: Record<string, string> = {
   "Espadon": "royal", "Epees Doubles": "royal", "Epee Longue": "royal",
@@ -96,6 +99,7 @@ function Overview({ personnages, donjons, onNavigate }: { personnages: Personnag
   const pWeapons = counts(personnages.map(x => x.arme));
   const dWeak = ELEMENTS.map(e => ({ label: e, count: donjons.filter(d => d.faiblesses.includes(e)).length }));
   const dTypes = counts(donjons.map(d => d.type));
+  const dDifficulties = counts(donjons.map(d => d.difficulte));
   return <div className="page-stack">
     <div className="hero-card"><div><span className="eyebrow">DATABASE INTELLIGENCE</span><h2>Tout ce qu’il faut savoir,<br/>en un seul endroit.</h2><p>Classements, répartitions et données brutes avec une lecture immédiate des catégories importantes.</p></div><div className="hero-orbit">✦</div></div>
     <div className="metric-grid">
@@ -109,7 +113,7 @@ function Overview({ personnages, donjons, onNavigate }: { personnages: Personnag
       <Bars title="Faiblesses des donjons" data={dWeak}/>
       <Bars title="Raretés" data={pRarity}/>
       <Bars title="Armes" data={pWeapons}/>
-      <Bars title="Types de donjon" data={dTypes}/>
+      <Bars title="Types de donjon" data={dTypes}/><Bars title="Difficultés" data={dDifficulties}/>
     </div>
     <div className="insight-grid">
       <Insight title="Élément le plus représenté" value={top(pElement)?.label || "—"} detail={`${top(pElement)?.count || 0} personnages`} toneClass={tone(top(pElement)?.label || "")}/>
@@ -157,12 +161,13 @@ function Donjons({ rows, isAdmin, onRowsChange }: { rows: Donjon[]; isAdmin: boo
   const [data, setData] = useState(rows);
   useEffect(() => { if (rows.length !== data.length) setData(rows); }, [rows.length, data.length]);
   const [q, setQ] = useState("");
-  const [filters, setFilters] = useState<DungeonFilters>({ etat: "Tous", type: "Tous", faiblesse: "Toutes" });
+  const [filters, setFilters] = useState<DungeonFilters>({ etat: "Tous", type: "Tous", difficulte: "Toutes", faiblesse: "Toutes" });
   const [sort, setSort] = useState("nom_donjon");
   const filtered = useMemo(() => {
     const result = data.filter(r => (!q || r.nom_donjon.toLowerCase().includes(q.toLowerCase())) &&
       (filters.etat === "Tous" || r.etat === filters.etat) &&
       (filters.type === "Tous" || r.type === filters.type) &&
+      (filters.difficulte === "Toutes" || r.difficulte === filters.difficulte) &&
       (filters.faiblesse === "Toutes" || r.faiblesses.includes(filters.faiblesse)));
     return [...result].sort((a, b) => {
       if (sort === "faiblesse") {
@@ -195,10 +200,10 @@ function Donjons({ rows, isAdmin, onRowsChange }: { rows: Donjon[]; isAdmin: boo
       <Metric label="Sans faiblesse" value={data.filter(r => !r.faiblesses.length).length} sub={pct(data.filter(r => !r.faiblesses.length).length, data.length)}/>
       <Metric label="Faiblesses moy." value={data.length ? (data.reduce((s, r) => s + r.faiblesses.length, 0) / data.length).toFixed(2) : "0"} sub="par donjon"/>
     </section>
-    <Toolbar q={q} setQ={setQ} filters={filters} setFilters={setFilters} sort={sort} setSort={setSort} options={[["etat", "État", ["Tous", ...ETATS_DONJON]], ["type", "Type", ["Tous", ...TYPES_DONJON]], ["faiblesse", "Faiblesse", ["Toutes", ...ELEMENTS]]]} sortOptions={[["nom_donjon", "Nom"], ["etat", "État"], ["type", "Type"], ["faiblesse", "Faiblesses"]]}/>
+    <Toolbar q={q} setQ={setQ} filters={filters} setFilters={setFilters} sort={sort} setSort={setSort} options={[["etat", "État", ["Tous", ...ETATS_DONJON]], ["type", "Type", ["Tous", ...TYPES_DONJON]], ["difficulte", "Difficulté", ["Toutes", ...DIFFICULTES_DONJON]], ["faiblesse", "Faiblesse", ["Toutes", ...ELEMENTS]]]} sortOptions={[["nom_donjon", "Nom"], ["difficulte", "Difficulté"], ["etat", "État"], ["type", "Type"], ["faiblesse", "Faiblesses"]]}/>
     <DungeonTable rows={filtered} viewKey={`${sort}|${q}|${JSON.stringify(filters)}`}  isAdmin={isAdmin} onRowsChange={(updater) => { setData(updater); onRowsChange(updater); }}/>
     <section className="analysis-block"><div className="section-title"><div><span className="eyebrow">ANALYSE</span><h2>Statistiques et classements</h2></div><span>{filtered.length} lignes filtrées</span></div>
-      <div className="chart-grid"><Bars title="Faiblesses — % des donjons filtrés" data={weaknessByElement} percentageTotal={filtered.length}/><Bars title="États" data={counts(filtered.map(x => x.etat))}/><Bars title="Types de donjon" data={counts(filtered.map(x => x.type))}/></div>
+      <div className="chart-grid"><Bars title="Faiblesses — % des donjons filtrés" data={weaknessByElement} percentageTotal={filtered.length}/><Bars title="États" data={counts(filtered.map(x => x.etat))}/><Bars title="Types de donjon" data={counts(filtered.map(x => x.type))}/><Bars title="Difficultés" data={counts(filtered.map(x => x.difficulte))}/></div>
     </section>
     {isAdmin && <CsvTools kind="donjons" rows={rows}/>} 
   </div>;
@@ -208,7 +213,7 @@ function CsvTools({ kind, rows }: { kind: AddKind; rows: Personnage[] | Donjon[]
   const [pending, startTransition] = useTransition();
   const [status, setStatus] = useState("");
   const router = useRouter();
-  const headers = kind === "personnages" ? ["personnage", "rarete", "arme", "element", "type_personnage", "histoire", "image_url"] : ["nom_donjon", "faiblesses", "etat", "type"];
+  const headers = kind === "personnages" ? ["personnage", "rarete", "arme", "element", "type_personnage", "histoire", "image_url"] : ["nom_donjon", "faiblesses", "etat", "type", "difficulte"];
   const exportCsv = () => {
     const esc = (v: unknown) => `"${String(v ?? "").replaceAll('"', '""')}"`;
     const body = [headers, ...rows.map(r => headers.map(h => h === "faiblesses" ? (r as Donjon).faiblesses.join("|") : (r as any)[h]))].map(line => line.map(esc).join(",")).join("\n");
@@ -305,7 +310,7 @@ function DungeonTable({ rows, viewKey, isAdmin, onRowsChange }: { rows: Donjon[]
     finally { setBusy(null); }
   }
 
-  return <section className="table-card"><div className="table-head"><div><h2>Classement / données</h2><span>{localRows.length} lignes · {isAdmin ? "édition directe activée" : "lecture seule"}</span></div><div className="table-head-actions"><Pagination page={page} pages={pages} setPage={setPage}/><button type="button" className="ghost collapse-button" onClick={() => setCollapsed(v => !v)}>{collapsed ? "Afficher le tableau ↓" : "Masquer le tableau ↑"}</button></div></div>{!collapsed && <><div className="table-scroll"><table><thead><tr><th>#</th><th>Donjon</th><th>Faiblesses</th><th>État</th><th>Type</th>{isAdmin && <th>Action</th>}</tr></thead><tbody>{visible.map((r, i) => editing === r.id ? <tr key={r.id}><td className="rank">#{(page - 1) * PAGE_SIZE + i + 1}</td><td colSpan={4}><form id={`d-${r.id}`} onSubmit={e => void submit(e, r.id)} className="table-edit-form dungeon-edit"><input type="hidden" name="id" value={r.id}/><input name="nom_donjon" defaultValue={r.nom_donjon}/><select name="faiblesses" multiple defaultValue={r.faiblesses} title="Sélectionne 0 à 2 éléments">{ELEMENTS.map(x => <option key={x}>{x}</option>)}</select><select name="etat" defaultValue={r.etat}>{ETATS_DONJON.map(x => <option key={x}>{x}</option>)}</select><select name="type" defaultValue={r.type}>{TYPES_DONJON.map(x => <option key={x}>{x}</option>)}</select></form></td><td><div className="row-actions"><button form={`d-${r.id}`} disabled={busy === r.id} className="primary">{busy === r.id ? "…" : "Enregistrer"}</button><button type="button" className="ghost" onClick={() => setEditing(null)}>Annuler</button></div></td></tr> : <tr key={r.id}><td className="rank">#{(page - 1) * PAGE_SIZE + i + 1}</td><td><b>{r.nom_donjon}</b></td><td>{r.faiblesses.length ? r.faiblesses.map(x => <Badge key={x} text={x}/>) : <span className="muted">Aucune</span>}</td><td>{r.etat}</td><td>{r.type}</td>{isAdmin && <td><div className="action-group"><button className="link-button" onClick={() => setEditing(r.id)}>Modifier</button><button className="delete-button" disabled={busy === r.id} onClick={() => void remove(r.id, r.nom_donjon)}>Supprimer</button></div></td>}</tr>)}</tbody></table></div><Pagination page={page} pages={pages} setPage={setPage}/></>}</section>;
+  return <section className="table-card"><div className="table-head"><div><h2>Classement / données</h2><span>{localRows.length} lignes · {isAdmin ? "édition directe activée" : "lecture seule"}</span></div><div className="table-head-actions"><Pagination page={page} pages={pages} setPage={setPage}/><button type="button" className="ghost collapse-button" onClick={() => setCollapsed(v => !v)}>{collapsed ? "Afficher le tableau ↓" : "Masquer le tableau ↑"}</button></div></div>{!collapsed && <><div className="table-scroll"><table><thead><tr><th>#</th><th>Donjon</th><th>Faiblesses</th><th>État</th><th>Type</th><th>Difficulté</th>{isAdmin && <th>Action</th>}</tr></thead><tbody>{visible.map((r, i) => editing === r.id ? <tr key={r.id}><td className="rank">#{(page - 1) * PAGE_SIZE + i + 1}</td><td colSpan={5}><form id={`d-${r.id}`} onSubmit={e => void submit(e, r.id)} className="table-edit-form dungeon-edit"><input type="hidden" name="id" value={r.id}/><input name="nom_donjon" defaultValue={r.nom_donjon}/><select name="faiblesses" multiple defaultValue={r.faiblesses} title="Sélectionne 0 à 2 éléments">{ELEMENTS.map(x => <option key={x}>{x}</option>)}</select><select name="etat" defaultValue={r.etat}>{ETATS_DONJON.map(x => <option key={x}>{x}</option>)}</select><select name="type" defaultValue={r.type}>{TYPES_DONJON.map(x => <option key={x}>{x}</option>)}</select><select name="difficulte" defaultValue={r.difficulte}>{DIFFICULTES_DONJON.map(x => <option key={x}>{x}</option>)}</select></form></td><td><div className="row-actions"><button form={`d-${r.id}`} disabled={busy === r.id} className="primary">{busy === r.id ? "…" : "Enregistrer"}</button><button type="button" className="ghost" onClick={() => setEditing(null)}>Annuler</button></div></td></tr> : <tr key={r.id}><td className="rank">#{(page - 1) * PAGE_SIZE + i + 1}</td><td><b>{r.nom_donjon}</b></td><td>{r.faiblesses.length ? r.faiblesses.map(x => <Badge key={x} text={x}/>) : <span className="muted">Aucune</span>}</td><td>{r.etat}</td><td>{r.type}</td><td><Badge text={r.difficulte}/></td>{isAdmin && <td><div className="action-group"><button className="link-button" onClick={() => setEditing(r.id)}>Modifier</button><button className="delete-button" disabled={busy === r.id} onClick={() => void remove(r.id, r.nom_donjon)}>Supprimer</button></div></td>}</tr>)}</tbody></table></div><Pagination page={page} pages={pages} setPage={setPage}/></>}</section>;
 }
 
 function Pagination({ page, pages, setPage }: { page: number; pages: number; setPage: (n: number) => void }) {
@@ -329,7 +334,7 @@ function QuickAddModal({ initialKind, onClose, onPersonnage, onDonjon }: { initi
     <div className="quick-modal" role="dialog" aria-modal="true" aria-labelledby="quick-add-title">
       <div className="quick-modal-head"><div><span className="eyebrow">ADMINISTRATION</span><h2 id="quick-add-title">Ajouter une entrée</h2><p>Crée une nouvelle ligne sans quitter la page.</p></div><button className="close-button" onClick={onClose} disabled={busy} aria-label="Fermer">×</button></div>
       <div className="quick-kind-switch"><button type="button" className={kind === "personnages" ? "kind-button active" : "kind-button"} onClick={() => setKind("personnages")}>♢ Personnage</button><button type="button" className={kind === "donjons" ? "kind-button active" : "kind-button"} onClick={() => setKind("donjons")}>◇ Donjon</button></div>
-      {kind === "personnages" ? <form onSubmit={submit} className="quick-form"><input name="personnage" placeholder="Nom du personnage" required/><select name="rarete" defaultValue="SSR">{RARETES.map(x => <option key={x}>{x}</option>)}</select><select name="arme">{ARMES.map(x => <option key={x}>{x}</option>)}</select><select name="element">{ELEMENTS.map(x => <option key={x}>{x}</option>)}</select><select name="type_personnage">{TYPES_PERSONNAGE.map(x => <option key={x}>{x}</option>)}</select><select name="histoire">{HISTOIRES.map(x => <option key={x}>{x}</option>)}</select><input name="image_url" placeholder="URL de l'image (facultatif)"/><button disabled={busy} className="primary wide" type="submit">{busy ? "Ajout…" : "Ajouter le personnage"}</button></form> : <form onSubmit={submit} className="quick-form"><input name="nom_donjon" placeholder="Nom du donjon" required/><label className="form-label">Faiblesses <span>0 à 2</span><select name="faiblesses" multiple defaultValue={[]} className="multi-select">{ELEMENTS.map(x => <option key={x}>{x}</option>)}</select></label><select name="etat">{ETATS_DONJON.map(x => <option key={x}>{x}</option>)}</select><select name="type">{TYPES_DONJON.map(x => <option key={x}>{x}</option>)}</select><button disabled={busy} className="primary wide" type="submit">{busy ? "Ajout…" : "Ajouter le donjon"}</button></form>}
+      {kind === "personnages" ? <form onSubmit={submit} className="quick-form"><input name="personnage" placeholder="Nom du personnage" required/><select name="rarete" defaultValue="SSR">{RARETES.map(x => <option key={x}>{x}</option>)}</select><select name="arme">{ARMES.map(x => <option key={x}>{x}</option>)}</select><select name="element">{ELEMENTS.map(x => <option key={x}>{x}</option>)}</select><select name="type_personnage">{TYPES_PERSONNAGE.map(x => <option key={x}>{x}</option>)}</select><select name="histoire">{HISTOIRES.map(x => <option key={x}>{x}</option>)}</select><input name="image_url" placeholder="URL de l'image (facultatif)"/><button disabled={busy} className="primary wide" type="submit">{busy ? "Ajout…" : "Ajouter le personnage"}</button></form> : <form onSubmit={submit} className="quick-form"><input name="nom_donjon" placeholder="Nom du donjon" required/><label className="form-label">Faiblesses <span>0 à 2</span><select name="faiblesses" multiple defaultValue={[]} className="multi-select">{ELEMENTS.map(x => <option key={x}>{x}</option>)}</select></label><select name="etat">{ETATS_DONJON.map(x => <option key={x}>{x}</option>)}</select><select name="type">{TYPES_DONJON.map(x => <option key={x}>{x}</option>)}</select><select name="difficulte" defaultValue="Normal">{DIFFICULTES_DONJON.map(x => <option key={x}>{x}</option>)}</select><button disabled={busy} className="primary wide" type="submit">{busy ? "Ajout…" : "Ajouter le donjon"}</button></form>}
     </div>
   </div>;
 }

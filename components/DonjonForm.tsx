@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { saveDonjon } from "@/app/actions";
-import { Donjon, ELEMENTS, ETATS_DONJON, TYPES_DONJON } from "@/lib/types";
+import { Donjon, ELEMENTS, ETATS_DONJON, TYPES_DONJON, DIFFICULTES_DONJON } from "@/lib/types";
 
 export function DonjonForm({ edit }: { edit: Donjon | null }) {
   const [selected, setSelected] = useState<string[]>(edit?.faiblesses ?? []);
@@ -18,6 +18,7 @@ export function DonjonForm({ edit }: { edit: Donjon | null }) {
     </label>
     <label>État<select name="etat" defaultValue={edit?.etat ?? ETATS_DONJON[0]}>{ETATS_DONJON.map(x=><option key={x}>{x}</option>)}</select></label>
     <label>Type<select name="type" defaultValue={edit?.type ?? TYPES_DONJON[0]}>{TYPES_DONJON.map(x=><option key={x}>{x}</option>)}</select></label>
+    <label>Difficulté<select name="difficulte" defaultValue={edit?.difficulte ?? DIFFICULTES_DONJON[1]}>{DIFFICULTES_DONJON.map(x=><option key={x}>{x}</option>)}</select></label>
     <div className="form-actions"><button className="primary" type="submit">{edit ? "Enregistrer" : "Ajouter"}</button></div>
   </form>;
 }

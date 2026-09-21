@@ -1297,3 +1297,61 @@ tr:hover td {
 
 
 .pk-feedback{flex-wrap:wrap}.pk-feedback-main{min-width:145px}.pk-explain{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.pk-interaction{display:inline-flex;align-items:center;gap:5px;padding:6px 8px;border-radius:7px;background:#171b22;border:1px solid #2c323d;color:#c9cdd5}.pk-interaction b{color:#ffcb3d;font-size:9px}.pk-revealed-types{display:grid;gap:5px;padding-left:13px;border-left:1px solid #343a46}.pk-revealed-types>small{color:#737b89;font-size:8px;letter-spacing:.12em}.pk-revealed-types>div{display:flex;gap:5px;flex-wrap:wrap}.pk-sort-feedback{display:flex;align-items:center;gap:9px;margin-top:12px;padding:10px 12px;border-radius:9px;font-size:10px}.pk-sort-feedback.good{background:#10241b;border:1px solid #245d46;color:#b9e6d0}.pk-sort-feedback.bad{background:#251416;border:1px solid #633034;color:#f0c0c3}.pk-sort-feedback b{font-size:11px}.pk-sort-items button{cursor:grab}.pk-sort-items button:active{cursor:grabbing}.pk-sort-feedback span{color:#b9bdc6}.pk-sort-feedback.good span{color:#b9e6d0}.pk-sort-feedback.bad span{color:#f0c0c3}
+
+/* Donjon difficulty palette */
+.badge.tone-facile {
+  color: #f5f5f7;
+  border-color: #70757d;
+  background: #3a3d43;
+}
+.badge.tone-normal {
+  color: #9ff0bc;
+  border-color: #2f7a4b;
+  background: #10291b;
+}
+.badge.tone-difficile {
+  color: #9fc5ff;
+  border-color: #3d6fae;
+  background: #13243a;
+}
+.badge.tone-cauchemar {
+  color: #ffe58a;
+  border-color: #9a7b18;
+  background: #30270c;
+}
+.badge.tone-infernal {
+  color: #ff9ac8;
+  border-color: #a63d70;
+  background: #351326;
+}
+.badge.tone-abysse {
+  color: #d4a7ff;
+  border-color: #7042a5;
+  background: #24153a;
+}
+.badge.tone-transcendance {
+  color: #ff8d8d;
+  border-color: #a83a3a;
+  background: #391515;
+}
+.bar-fill.tone-facile { background: #bfc3c9; }
+.bar-fill.tone-normal { background: #3fc36d; }
+.bar-fill.tone-difficile { background: #4f8ee8; }
+.bar-fill.tone-cauchemar { background: #e5c329; }
+.bar-fill.tone-infernal { background: #e85b9e; }
+.bar-fill.tone-abysse { background: #9958e8; }
+.bar-fill.tone-transcendance { background: #e74a4a; }
+.legend-dot.tone-facile { background: #bfc3c9; }
+.legend-dot.tone-normal { background: #3fc36d; }
+.legend-dot.tone-difficile { background: #4f8ee8; }
+.legend-dot.tone-cauchemar { background: #e5c329; }
+.legend-dot.tone-infernal { background: #e85b9e; }
+.legend-dot.tone-abysse { background: #9958e8; }
+.legend-dot.tone-transcendance { background: #e74a4a; }
+.tone-text-facile { color: #d6d9de; }
+.tone-text-normal { color: #65d989; }
+.tone-text-difficile { color: #76aaff; }
+.tone-text-cauchemar { color: #f0d34f; }
+.tone-text-infernal { color: #f477b1; }
+.tone-text-abysse { color: #b778ff; }
+.tone-text-transcendance { color: #ff6868; }

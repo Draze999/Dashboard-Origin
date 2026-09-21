@@ -88,3 +88,14 @@ npm start
 ```
 
 Le projet utilise le système `proxy.ts` de Next.js 16. Next.js 16 a renommé `middleware.ts` en `proxy.ts`.
+
+
+## Mise à jour des difficultés de donjons
+
+La colonne `difficulte` a été ajoutée aux donjons avec les valeurs :
+`Facile`, `Normal`, `Difficile`, `Cauchemar`, `Infernal`, `Abysse`, `Transcendance`.
+
+Pour une base Supabase déjà existante, exécuter une seule fois :
+`supabase/migration-difficulte-donjons.sql`
+
+Les donjons existants sont automatiquement initialisés à `Normal`. La création, l'édition, les filtres, le tri, les statistiques et les exports/imports CSV prennent ensuite en charge la difficulté.

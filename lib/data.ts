@@ -15,7 +15,7 @@ export async function getDonjons() {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from("donjons")
-    .select("id,nom_donjon,faiblesses,etat,type,created_at,updated_at")
+    .select("id,nom_donjon,faiblesses,etat,type,difficulte,created_at,updated_at")
     .order("nom_donjon");
   if (error) throw new Error(error.message);
   return (data ?? []) as Donjon[];
