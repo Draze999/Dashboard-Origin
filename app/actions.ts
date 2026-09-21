@@ -22,11 +22,15 @@ const dSchema = z.object({
   faiblesses: z.array(z.enum(ELEMENTS)).max(2).refine(v => new Set(v).size === v.length, "Une faiblesse ne peut pas être sélectionnée deux fois."),
   etat: z.enum(ETATS_DONJON),
   type: z.enum(TYPES_DONJON),
-  difficulte: z.enum(DIFFICULTES_DONJON)
+  difficulte: z.array(z.enum(DIFFICULTES_DONJON)).min(1).refine(v => new Set(v).size === v.length, "Une difficulté ne peut pas être sélectionnée deux fois.")
 });
 
 function weaknesses(fd: FormData) {
   return fd.getAll("faiblesses").map(String).filter(Boolean);
+}
+
+function difficulties(fd: FormData) {
+  return fd.getAll("difficulte").map(String).filter(Boolean);
 }
 
 export async function loginAdmin(_prev: { error: string }, fd: FormData) {
@@ -97,7 +101,7 @@ export async function saveDonjon(fd: FormData): Promise<{ ok: true; row: Donjon 
     faiblesses: weaknesses(fd),
     etat: fd.get("etat"),
     type: fd.get("type"),
-    difficulte: fd.get("difficulte")
+    difficulte: difficulties(fd)
   });
   if (!parsed.success) throw new Error("Données donjon invalides.");
 
@@ -159,7 +163,7 @@ export async function importCsv(fd: FormData): Promise<{ ok: true; inserted: num
       faiblesses: (r.faiblesses || "").split("|").filter(Boolean),
       etat: r.etat,
       type: r.type,
-      difficulte: r.difficulte || "Normal"
+      difficulte: (r.difficulte || "Normal").split("|").map(x => x.trim()).filter(Boolean)
     }));
     const batches = Array.from({ length: Math.ceil(data.length / BATCH) }, (_, index) => data.slice(index * BATCH, (index + 1) * BATCH));
     for (let i = 0; i < batches.length; i += 4) {

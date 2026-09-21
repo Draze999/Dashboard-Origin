@@ -1355,3 +1355,19 @@ tr:hover td {
 .tone-text-infernal { color: #f477b1; }
 .tone-text-abysse { color: #b778ff; }
 .tone-text-transcendance { color: #ff6868; }
+
+/* Donjons : plusieurs difficultés */
+.badge-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.dungeon-edit select[multiple] {
+  min-height: 96px;
+}
+.difficulty-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

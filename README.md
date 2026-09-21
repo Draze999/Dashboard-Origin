@@ -99,3 +99,13 @@ Pour une base Supabase déjà existante, exécuter une seule fois :
 `supabase/migration-difficulte-donjons.sql`
 
 Les donjons existants sont automatiquement initialisés à `Normal`. La création, l'édition, les filtres, le tri, les statistiques et les exports/imports CSV prennent ensuite en charge la difficulté.
+
+
+### Difficultés multiples des donjons
+
+Un donjon peut maintenant posséder une ou plusieurs difficultés, sans limite.
+La colonne Supabase `donjons.difficulte` est un tableau `text[]`.
+
+Pour une base déjà existante, exécuter `supabase/migration-difficulte-donjons.sql`.
+Dans les CSV, plusieurs difficultés sont séparées par `|`, par exemple :
+`Difficile|Cauchemar|Infernal|Abysse`.

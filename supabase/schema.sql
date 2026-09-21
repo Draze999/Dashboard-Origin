@@ -23,7 +23,7 @@ create table public.donjons (
   faiblesses text[] not null default '{}',
   etat text not null check (etat in ('Disponible','Temporairement désactivé','Retiré','Terminé')),
   type text not null check (type in ('Boss d’Elite','Donjons','Raids','Jonctions')),
-  difficulte text not null default 'Normal' check (difficulte in ('Facile','Normal','Difficile','Cauchemar','Infernal','Abysse','Transcendance')),
+  difficulte text[] not null default array['Normal']::text[] check (cardinality(difficulte) >= 1 and difficulte <@ array['Facile','Normal','Difficile','Cauchemar','Infernal','Abysse','Transcendance']::text[]),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint donjons_faiblesses_max_2 check (cardinality(faiblesses) between 0 and 2),
@@ -37,7 +37,7 @@ create index personnages_histoire_idx on public.personnages(histoire);
 create index personnages_rarete_idx on public.personnages(rarete);
 create index donjons_etat_idx on public.donjons(etat);
 create index donjons_type_idx on public.donjons(type);
-create index donjons_difficulte_idx on public.donjons(difficulte);
+create index donjons_difficulte_gin_idx on public.donjons using gin(difficulte);
 create index donjons_faiblesses_gin_idx on public.donjons using gin(faiblesses);
 
 create or replace function public.set_updated_at()

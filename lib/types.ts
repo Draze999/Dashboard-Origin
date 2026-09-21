@@ -14,5 +14,5 @@ export type Personnage = {
 };
 export type Donjon = {
   id: string; nom_donjon: string; faiblesses: string[]; etat: typeof ETATS_DONJON[number];
-  type: typeof TYPES_DONJON[number]; difficulte: typeof DIFFICULTES_DONJON[number]; created_at: string; updated_at: string;
+  type: typeof TYPES_DONJON[number]; difficulte: Array<typeof DIFFICULTES_DONJON[number]>; created_at: string; updated_at: string;
 };

@@ -8,6 +8,10 @@ export function DonjonForm({ edit }: { edit: Donjon | null }) {
   const [selected, setSelected] = useState<string[]>(edit?.faiblesses ?? []);
   const toggle = (e: string) => setSelected(v => v.includes(e) ? v.filter(x => x !== e) : v.length < 2 ? [...v, e] : v);
 
+  const selectedDifficulties = edit?.difficulte ?? ["Normal"];
+  const [difficulties, setDifficulties] = useState<string[]>(selectedDifficulties);
+  const toggleDifficulty = (value: string) => setDifficulties(v => v.includes(value) ? v.filter(x => x !== value) : [...v, value]);
+
   return <form className="form-card" action={async (fd) => { void (await saveDonjon(fd)); }}>
     {edit && <input type="hidden" name="id" value={edit.id}/>}
     <h3>{edit ? "Modifier" : "Ajouter"} un donjon</h3>
@@ -18,7 +22,7 @@ export function DonjonForm({ edit }: { edit: Donjon | null }) {
     </label>
     <label>État<select name="etat" defaultValue={edit?.etat ?? ETATS_DONJON[0]}>{ETATS_DONJON.map(x=><option key={x}>{x}</option>)}</select></label>
     <label>Type<select name="type" defaultValue={edit?.type ?? TYPES_DONJON[0]}>{TYPES_DONJON.map(x=><option key={x}>{x}</option>)}</select></label>
-    <label>Difficulté<select name="difficulte" defaultValue={edit?.difficulte ?? DIFFICULTES_DONJON[1]}>{DIFFICULTES_DONJON.map(x=><option key={x}>{x}</option>)}</select></label>
+    <label>Difficulté <span className="hint">(plusieurs possibles)</span><div className="checks difficulty-checks">{DIFFICULTES_DONJON.map(x => <label className="check" key={x}><input type="checkbox" checked={difficulties.includes(x)} onChange={() => toggleDifficulty(x)}/> {x}</label>)}</div>{difficulties.map(x => <input key={x} type="hidden" name="difficulte" value={x}/>)}</label>
     <div className="form-actions"><button className="primary" type="submit">{edit ? "Enregistrer" : "Ajouter"}</button></div>
   </form>;
 }
